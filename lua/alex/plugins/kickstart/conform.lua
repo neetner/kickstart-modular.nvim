@@ -31,14 +31,30 @@ return {
       end,
       formatters_by_ft = {
         lua = { 'stylua' },
+        sh = { 'shfmt' },
         tex = { 'tex-fmt' },
         cls = { 'tex-fmt' },
         sty = { 'tex-fmt' },
+        elixir = { 'mix_format' },
+        heex = { 'mix_format' },
+        eex = { 'mix_format' },
+        css = { 'prettier' },
+        html = { 'prettier' },
+        json = { 'prettier' },
+        javascript = { 'prettier' },
+        typescript = { 'prettier' },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --
         -- You can use 'stop_after_first' to run the first available formatter from the list
         -- javascript = { "prettierd", "prettier", stop_after_first = true },
+      },
+      formatters = {
+        mix_format = {
+          command = 'mise',
+          args = { 'exec', '--', 'mix', 'format', '-' },
+          stdin = true,
+        },
       },
     },
   },
