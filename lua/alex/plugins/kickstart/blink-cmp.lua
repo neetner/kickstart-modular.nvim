@@ -21,14 +21,55 @@ return {
           -- `friendly-snippets` contains a variety of premade snippets.
           --    See the README about individual language/framework/plugin snippets:
           --    https://github.com/rafamadriz/friendly-snippets
-          -- {
-          --   'rafamadriz/friendly-snippets',
-          --   config = function()
-          --     require('luasnip.loaders.from_vscode').lazy_load()
-          --   end,
-          -- },
+          {
+            'rafamadriz/friendly-snippets',
+          },
         },
-        opts = {},
+        config = function()
+          -- FIRST: Load friendly-snippets
+          require('luasnip.loaders.from_vscode').lazy_load()
+
+          local ls = require 'luasnip'
+
+          ls.setup {
+            -- load the variables file
+            snip_env = dofile(vim.fn.stdpath 'config' .. '/luasnippets/header.lua'),
+
+            enable_autosnippets = true,
+            update_events = 'TextChanged,TextChangedI',
+            region_check_events = 'CursorMoved,CursorMovedI',
+            delete_check_events = 'TextChanged,InsertLeave',
+
+            store_selection_keys = '<C-s>',
+          }
+
+          -- SECOND: Load your custom snippets (these will override/prioritize)
+          require('luasnip.loaders.from_lua').load()
+
+          vim.keymap.set('n', '<leader>rs', function()
+            require('luasnip.loaders.from_lua').load()
+            vim.notify 'Snippets reloaded'
+          end, { desc = '[R]eload [S]nippets' })
+
+          -- Commetned because these conflict with Blinks keys
+          -- Blink handles these navigations!
+          --
+          -- vim.keymap.set({ 'i', 's' }, '<Tab>', function()
+          --   ls.jump(1)
+          -- end, { silent = true })
+          -- vim.keymap.set({ 'i', 's' }, '<S-Tab>', function()
+          --   ls.jump(-1)
+          -- end, { silent = true })
+          -- vim.keymap.set({ 'i' }, '<CR>', function()
+          --   ls.expand()
+          -- end, { silent = true })
+
+          vim.keymap.set({ 'i', 's' }, '<C-f>', function()
+            if ls.choice_active() then
+              ls.change_choice(1)
+            end
+          end, { silent = true })
+        end,
       },
       'folke/lazydev.nvim',
     },
@@ -57,7 +98,40 @@ return {
         -- <c-k>: Toggle signature help
         --
         -- See :h blink-cmp-config-keymap for defining your own keymap
-        preset = 'default',
+        -- and https://cmp.saghen.dev/configuration/keymap
+        preset = 'enter', -- 'super-tab', --  'default',
+
+        ['<CR>'] = { 'select_and_accept', 'fallback' },
+        ['<C-k>'] = {}, --  free <C-k> which is used for moving within insert mode
+        ['<Up>'] = {},
+        ['<Down>'] = {},
+        ['<C-i>'] = { 'show_signature', 'hide_signature', 'fallback' },
+        ['<Tab>'] = {
+          function()
+            local ls = require 'luasnip'
+            if ls.jumpable(1) then
+              vim.schedule(function()
+                ls.jump(1)
+              end)
+              return true
+            end
+          end,
+          'fallback',
+        },
+        ['<S-Tab>'] = {
+          function()
+            local ls = require 'luasnip'
+            if ls.jumpable(-1) then
+              vim.schedule(function()
+                ls.jump(-1)
+              end)
+              return true
+            end
+          end,
+          'fallback',
+        },
+        -- ['<Tab>'] = { 'snippet_forward', 'fallback' },
+        -- ['<S-Tab>'] = { 'snippet_backward', 'fallback' },
 
         -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
         --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
@@ -78,7 +152,14 @@ return {
       sources = {
         default = { 'lsp', 'path', 'snippets', 'lazydev' },
         providers = {
-          lazydev = { module = 'lazydev.integrations.blink', score_offset = 100 },
+          snippets = {
+            -- enabled = true,
+            score_offset = 200,
+          },
+          lazydev = {
+            module = 'lazydev.integrations.blink',
+            score_offset = 100,
+          },
         },
       },
 
@@ -91,7 +172,7 @@ return {
       -- the rust implementation via `'prefer_rust_with_warning'`
       --
       -- See :h blink-cmp-config-fuzzy for more information
-      fuzzy = { implementation = 'lua' },
+      fuzzy = { implementation = 'prefer_rust' },
 
       -- Shows a signature help window while you type arguments for a function
       signature = { enabled = true },

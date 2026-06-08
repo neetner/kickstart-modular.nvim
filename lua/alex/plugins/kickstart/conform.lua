@@ -31,6 +31,9 @@ return {
       end,
       formatters_by_ft = {
         lua = { 'stylua' },
+        tex = { 'tex-fmt' },
+        cls = { 'tex-fmt' },
+        sty = { 'tex-fmt' },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --

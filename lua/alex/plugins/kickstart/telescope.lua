@@ -55,6 +55,9 @@ return {
         -- You can put your default mappings / updates / etc. in here
         --  All the info you're looking for is in `:help telescope.setup()`
         --
+        defaults = {
+          initial_mode = 'normal',
+        },
         -- defaults = {
         --   mappings = {
         --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
@@ -105,7 +108,10 @@ return {
 
       -- Shortcut for searching your Neovim configuration files
       vim.keymap.set('n', '<leader>sn', function()
-        builtin.find_files { cwd = vim.fn.stdpath 'config' }
+        builtin.find_files {
+          cwd = vim.fn.stdpath 'config',
+          -- initial_mode = 'insert', -- Override the default here
+        }
       end, { desc = '[S]earch [N]eovim files' })
     end,
   },
