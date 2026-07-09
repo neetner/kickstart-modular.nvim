@@ -20,11 +20,13 @@ return {
         -- have a well standardized coding style. You can add additional
         -- languages here or re-enable it for the disabled ones.
         local disable_filetypes = { c = true, cpp = true }
+        -- mojo's SDK CLI has slower cold-start latency than the other formatters here
+        local slow_filetypes = { mojo = true }
         if disable_filetypes[vim.bo[bufnr].filetype] then
           return nil
         else
           return {
-            timeout_ms = 500,
+            timeout_ms = slow_filetypes[vim.bo[bufnr].filetype] and 3000 or 500,
             lsp_format = 'fallback',
           }
         end
@@ -43,6 +45,7 @@ return {
         json = { 'prettier' },
         javascript = { 'prettier' },
         typescript = { 'prettier' },
+        mojo = { 'mojo_format' },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --
@@ -54,6 +57,14 @@ return {
           command = 'mise',
           args = { 'exec', '--', 'mix', 'format', '-' },
           stdin = true,
+        },
+        mojo_format = {
+          command = function()
+            local ok, bin = pcall(function() return require('mojo.env.bin').get_mojo_cmd() end)
+            return (ok and bin) or 'mojo'
+          end,
+          args = { 'format', '$FILENAME' },
+          stdin = false,
         },
       },
     },
