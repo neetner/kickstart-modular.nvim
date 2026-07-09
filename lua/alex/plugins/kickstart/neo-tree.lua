@@ -12,6 +12,7 @@ return {
   lazy = false,
   keys = {
     { '\\', ':Neotree reveal<CR>', desc = 'NeoTree reveal', silent = true },
+    { 'b\\', ':Neotree buffers<CR>', desc = 'NeoTree show buffers', silent = true },
   },
   opts = {
     filesystem = {

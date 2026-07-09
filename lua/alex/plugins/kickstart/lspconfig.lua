@@ -198,6 +198,7 @@ return {
       --  So, we create new capabilities with blink.cmp, and then broadcast that to the servers.
       local capabilities = require('blink.cmp').get_lsp_capabilities()
 
+      -- NOTE: below is where the actual LSP's get added / removed
       -- Enable the following language servers
       --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
       --
@@ -221,6 +222,11 @@ return {
         -- ts_ls = {},
         --
 
+        elixirls = {},
+        cssls = {},
+        jsonls = {},
+        ts_ls = {},
+
         lua_ls = {
           -- cmd = { ... },
           -- filetypes = { ... },
@@ -234,6 +240,15 @@ return {
               -- diagnostics = { disable = { 'missing-fields' } },
             },
           },
+        },
+        texlab = {
+          -- settings = {
+          --   texlab = {
+          --     build = {
+          --       onSave = false,
+          --     },
+          --   },
+          -- },
         },
       }
 
@@ -253,6 +268,8 @@ return {
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
+        'prettier', -- Used to format CSS/HTML/JSON/JS
+        'shfmt', -- Used to format shell scripts
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
