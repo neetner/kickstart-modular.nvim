@@ -85,6 +85,11 @@ vim.o.confirm = true
 
 vim.opt.termguicolors = true
 
+-- Allow project-local .nvim.lua / .nvim.vim / .exrc config files (e.g. per-project
+-- LSP settings overrides). Neovim prompts for `:trust` the first time a new one is
+-- found, so untrusted repos can't silently run code just by opening a file in them.
+vim.o.exrc = true
+
 -- set tab size to 2 spaces
 vim.opt.tabstop = 2
 vim.opt.softtabstop = 2
